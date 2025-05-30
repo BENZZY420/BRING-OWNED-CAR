@@ -32,7 +32,11 @@ local function bringOwnedCarToPlayer()
 	end
 
 	if not ownedCar then
-		Library:Notify("❌ Could not find your car!", 3)
+		Library:Notify({
+			Title = "Bring Owned Car",
+			Description = "❌ Could not find your car!",
+			Time = 3
+		})
 		return
 	end
 
@@ -99,8 +103,12 @@ local function bringOwnedCarToPlayer()
 		end
 	end
 
-	-- ✅ Use your exact notification style
-	Library:Notify("✅ Your owned car has been brought near you!", 3)
+	-- ✅ Final notification using YOUR format
+	Library:Notify({
+		Title = "Bring Owned Car",
+		Description = "✅ Brought owned car to you",
+		Time = 3
+	})
 end
 
 -- Update character on respawn

@@ -1,12 +1,14 @@
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
+-- Function to get character and HumanoidRootPart
 local function getCharacterAndRootPart()
 	local character = player.Character or player.CharacterAdded:Wait()
 	local rootPart = character:WaitForChild("HumanoidRootPart")
 	return character, rootPart
 end
 
+-- Function to bring the player's OWN car to them and seat them
 local function bringOwnedCarToPlayer()
 	local character, rootPart = getCharacterAndRootPart()
 	local civCars = workspace:FindFirstChild("CivCars")
@@ -16,6 +18,9 @@ local function bringOwnedCarToPlayer()
 	end
 
 	local ownedCar = nil
+	local playerPosition = rootPart.Position
+
+	-- Find your own car based on "Owner" tag
 	for _, car in ipairs(civCars:GetChildren()) do
 		if car:IsA("Model") and car:FindFirstChild("DriveSeat") then
 			local owner = car:FindFirstChild("Owner")
@@ -27,15 +32,11 @@ local function bringOwnedCarToPlayer()
 	end
 
 	if not ownedCar then
-		game.StarterGui:SetCore("SendNotification", {
-			Title = "No Car Found",
-			Text = "❌ Could not find your car!",
-			Duration = 5
-		})
+		Library:Notify("❌ Could not find your car!", 3)
 		return
 	end
 
-	-- Make sure the car has a PrimaryPart, if not set one automatically
+	-- Make sure the car has a PrimaryPart
 	if not ownedCar.PrimaryPart then
 		ownedCar.PrimaryPart = ownedCar:FindFirstChild("PrimaryPart") or ownedCar:FindFirstChildWhichIsA("BasePart")
 		if not ownedCar.PrimaryPart then
@@ -64,10 +65,10 @@ local function bringOwnedCarToPlayer()
 	targetPos = Vector3.new(targetPos.X, groundY + carSize.Y / 2 + 0.1, targetPos.Z)
 	local targetCFrame = CFrame.new(targetPos, targetPos + forward)
 
-	-- Move the car
+	-- Actually move the car
 	ownedCar:PivotTo(targetCFrame)
 
-	-- Anchor briefly to prevent physics issues
+	-- Force position by anchoring briefly
 	for _, part in ipairs(ownedCar:GetDescendants()) do
 		if part:IsA("BasePart") then
 			part.Anchored = true
@@ -82,32 +83,30 @@ local function bringOwnedCarToPlayer()
 		end
 	end
 
-	-- Update position values if any
+	-- Update any server-tracked position value
 	local posValue = ownedCar:FindFirstChild("Position") or ownedCar:FindFirstChild("LastLocation") or ownedCar:FindFirstChild("SpawnPoint")
 	if posValue and posValue:IsA("Vector3Value") then
 		posValue.Value = targetPos
 	end
 
 	-- Sit the player in the car
-	task.wait(0.2)
+	task.wait(0.3)
 	local driveSeat = ownedCar:FindFirstChild("DriveSeat")
 	if driveSeat and driveSeat:IsA("VehicleSeat") then
 		local humanoid = character:FindFirstChildOfClass("Humanoid")
 		if humanoid then
-			task.wait(0.1)
 			driveSeat:Sit(humanoid)
 		end
 	end
 
-	game.StarterGui:SetCore("SendNotification", {
-		Title = "Car Brought",
-		Text = "✅ Your owned car has been brought and you’re in!",
-		Duration = 5
-	})
+	-- Custom library notification
+	Library:Notify("✅ Your owned car has been brought near you!", 3)
 end
 
+-- Update character on respawn
 player.CharacterAdded:Connect(function()
 	getCharacterAndRootPart()
 end)
 
+-- 🚗 Auto-run
 bringOwnedCarToPlayer()

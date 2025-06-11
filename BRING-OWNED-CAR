@@ -1,6 +1,9 @@
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
+-- ✅ Load Iris Notification System
+local Notification = loadstring(game:HttpGet("https://api.irisapp.ca/Scripts/IrisBetterNotifications.lua"))()
+
 -- Function to get character and HumanoidRootPart
 local function getCharacterAndRootPart()
 	local character = player.Character or player.CharacterAdded:Wait()
@@ -32,13 +35,12 @@ local function bringOwnedCarToPlayer()
 	end
 
 	if not ownedCar then
-		if Library and Library.Notify then
-			Library:Notify({
-				Title = "Bring Owned Car",
-				Description = "❌ Could not find your car!",
-				Time = 3
-			})
-		end
+		Notification.Notify("From snipet.cc", "❌ Could not find your car!", "Snippet", {
+			Duration = 3,
+			Main = {
+				Rounding = true,
+			}
+		})
 		return
 	end
 
@@ -105,14 +107,13 @@ local function bringOwnedCarToPlayer()
 		end
 	end
 
-	-- ✅ Final notification using YOUR format
-	if Library and Library.Notify then
-		Library:Notify({
-			Title = "Bring Owned Car",
-			Description = "✅ Brought owned car to you",
-			Time = 3
-		})
-	end
+	-- ✅ Final notification using Iris
+	Notification.Notify("From snipet.cc", "✅ Brought owned car to you", "Snippet", {
+		Duration = 3,
+		Main = {
+			Rounding = true,
+		}
+	})
 end
 
 -- Update character on respawn

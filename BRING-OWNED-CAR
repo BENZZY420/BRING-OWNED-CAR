@@ -11,6 +11,14 @@ local function getCharacterAndRootPart()
 	return character, rootPart
 end
 
+local function weldParts(part0, part1)
+	local weld = Instance.new("WeldConstraint")
+	weld.Part0 = part0
+	weld.Part1 = part1
+	weld.Parent = part0
+	return weld
+end
+
 -- Function to bring the player's OWN car to them and seat them
 local function bringOwnedCarToPlayer()
 	local character, rootPart = getCharacterAndRootPart()
@@ -37,9 +45,7 @@ local function bringOwnedCarToPlayer()
 	if not ownedCar then
 		Notification.Notify("From snipet.cc", "❌ Could not find your car!", "Snippet", {
 			Duration = 3,
-			Main = {
-				Rounding = true,
-			}
+			Main = { Rounding = true }
 		})
 		return
 	end
@@ -73,10 +79,29 @@ local function bringOwnedCarToPlayer()
 	targetPos = Vector3.new(targetPos.X, groundY + carSize.Y / 2 + 0.1, targetPos.Z)
 	local targetCFrame = CFrame.new(targetPos, targetPos + forward)
 
-	-- Actually move the car
+	local driveSeat = ownedCar:FindFirstChild("DriveSeat")
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not driveSeat or not humanoid then
+		Notification.Notify("From snipet.cc", "🚫 DriveSeat or Humanoid missing!", "Snippet", {
+			Duration = 3,
+			Main = { Rounding = true }
+		})
+		return
+	end
+
+	-- Sit the player first so Roblox registers occupant before moving
+	driveSeat:Sit(humanoid)
+
+	-- Weld the car to player to move it without moving player
+	local weld = weldParts(rootPart, ownedCar.PrimaryPart)
+
+	-- Move the car to the target position (player stays put)
 	ownedCar:PivotTo(targetCFrame)
 
-	-- Force position by anchoring briefly
+	-- Remove weld so car moves freely
+	weld:Destroy()
+
+	-- Force position by anchoring briefly (optional, you can remove if unwanted)
 	for _, part in ipairs(ownedCar:GetDescendants()) do
 		if part:IsA("BasePart") then
 			part.Anchored = true
@@ -97,22 +122,10 @@ local function bringOwnedCarToPlayer()
 		posValue.Value = targetPos
 	end
 
-	-- Sit the player in the car
-	task.wait(0.3)
-	local driveSeat = ownedCar:FindFirstChild("DriveSeat")
-	if driveSeat and driveSeat:IsA("VehicleSeat") then
-		local humanoid = character:FindFirstChildOfClass("Humanoid")
-		if humanoid then
-			driveSeat:Sit(humanoid)
-		end
-	end
-
 	-- ✅ Final notification using Iris
 	Notification.Notify("From snipet.cc", "✅ Brought owned car to you", "Snippet", {
 		Duration = 3,
-		Main = {
-			Rounding = true,
-		}
+		Main = { Rounding = true }
 	})
 end
 

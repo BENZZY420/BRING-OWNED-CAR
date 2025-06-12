@@ -35,7 +35,7 @@ local function bringOwnedCarToPlayer()
 	end
 
 	if not ownedCar then
-		Notification.Notify("From snipet.cc", "❌ Could not find your car!", "rbxasset://textures/ui/GuiImagePlaceholder.png", {
+		Notification.Notify("From snipet.cc", "❌ Could not find your car!", "", {
 			Duration = 3,
 			Main = {
 				Rounding = true,
@@ -106,7 +106,7 @@ local function bringOwnedCarToPlayer()
 	end
 
 	-- ✅ Final notification using Iris
-	Notification.Notify("From snipet.cc", "✅ Your owned car has been brought and you are seated!", "rbxasset://textures/ui/GuiImagePlaceholder.png", {
+	Notification.Notify("From snipet.cc", "✅ Your owned car has been brought and you are seated!", "", {
 		Duration = 3,
 		Main = {
 			Rounding = true,
